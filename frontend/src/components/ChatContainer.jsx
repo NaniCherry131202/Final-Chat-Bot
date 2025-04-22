@@ -1,11 +1,11 @@
-import { useState, useRef, useEffect } from "react";
 import { useChatStore } from "../store/useChatStore";
-import { useAuthStore } from "../store/useAuthStore";
+import { useEffect, useRef } from "react";
+
 import ChatHeader from "./ChatHeader";
 import MessageInput from "./MessageInput";
 import MessageSkeleton from "./skeletons/MessageSkeleton";
+import { useAuthStore } from "../store/useAuthStore";
 import { formatMessageTime } from "../lib/utils";
-import Modal from "./Modal"; // Import the custom modal
 
 const ChatContainer = () => {
   const {
@@ -18,11 +18,12 @@ const ChatContainer = () => {
   } = useChatStore();
   const { authUser } = useAuthStore();
   const messageEndRef = useRef(null);
-  const [selectedImage, setSelectedImage] = useState(null);
 
   useEffect(() => {
     getMessages(selectedUser._id);
+
     subscribeToMessages();
+
     return () => unsubscribeFromMessages();
   }, [selectedUser._id, getMessages, subscribeToMessages, unsubscribeFromMessages]);
 
@@ -72,21 +73,11 @@ const ChatContainer = () => {
             </div>
             <div className="chat-bubble flex flex-col">
               {message.image && (
-                <div className="relative">
-                  <img
-                    src={message.image}
-                    alt="Attachment"
-                    className="sm:max-w-[200px] rounded-md mb-2 cursor-pointer"
-                    onClick={() => setSelectedImage(message.image)}
-                  />
-                  <a
-                    href={message.image}
-                    download
-                    className="absolute top-2 right-2 bg-white text-black px-2 py-1 text-xs rounded shadow"
-                  >
-                    <img src="/download.svg"/>
-                  </a>
-                </div>
+                <img
+                  src={message.image}
+                  alt="Attachment"
+                  className="sm:max-w-[200px] rounded-md mb-2"
+                />
               )}
               {message.text && <p>{message.text}</p>}
             </div>
@@ -95,14 +86,7 @@ const ChatContainer = () => {
       </div>
 
       <MessageInput />
-
-      {selectedImage && (
-        <Modal onClose={() => setSelectedImage(null)}>
-          <img src={selectedImage} alt="Zoomed Attachment" className="max-w-full max-h-screen" />
-        </Modal>
-      )}
     </div>
   );
 };
-
 export default ChatContainer;
